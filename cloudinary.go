@@ -2,6 +2,7 @@ package cloudcourier
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/cloudinary/cloudinary-go"
@@ -26,15 +27,20 @@ func newCloudinaryClient(cbb *CloudCourierBridge) (StorageClient, error) {
 	if cbb.ApiKey == "" || cbb.ApiSecret == "" || cbb.CloudName == "" {
 		return nil, errors.New("incomplete Cloudinary configuration") // TODO: handle properly.
 	}
+	cl, err := cloudinary.NewFromParams(cbb.CloudName, cbb.ApiKey, cbb.ApiSecret)
+	if err != nil {
+		cloudinaryErr := fmt.Sprintf("%s", err)
+		return nil, errors.New(cloudinaryErr)
+	}
 	// To Implement the initialization of cloudinary client
 	return &CloudinaryClient{
-		ApiKey:    cbb.ApiKey,
-		ApiSecret: cbb.ApiSecret,
+		Client:    cl,
 		CloudName: cbb.CloudName,
 	}, nil
 }
 
 func (c *CloudinaryClient) UploadFile(filepath string, reader io.Reader) error {
+
 	return nil
 }
 

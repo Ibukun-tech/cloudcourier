@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"cloud.google.com/go/storage"
+	"google.golang.org/api/iterator"
 )
 
 func newGcpClient(ccb *CloudCourierBridge) (StorageClient, error) {
@@ -22,6 +23,7 @@ func newGcpClient(ccb *CloudCourierBridge) (StorageClient, error) {
 	return &GcsClient{
 		Client:     client,
 		BucketName: ccb.CloudBucket,
+		ctx:        ctx,
 	}, nil
 }
 
@@ -55,13 +57,27 @@ type GcsClient struct {
 	Client *storage.Client
 	// The name of the bucket to operate on
 	BucketName string
+
+	ctx context.Context
 }
 
 func (g *GcsClient) DeleteFile(fieldID string) error {
 	return nil
 }
 func (g *GcsClient) ListFiles(directory string) ([]string, error) {
-
+	// For lisiting files in a google cloud storage you have to list the nme of the bucket
+	var files []string
+	it := g.Client.Bucket(directory).Objects(g.ctx, nil)
+	for {
+		file, err := it.Next()
+		if err == iterator.Done() {
+			return files, nil
+		}
+		if err != nil {
+			return nil, errors.New("")
+		}
+		files = append(files, file.Name)
+	}
 	return nil, nil
 }
 

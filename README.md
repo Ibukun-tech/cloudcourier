@@ -83,4 +83,4 @@ Cloud Courier is released under the MIT License. See the [LICENSE](LICENSE) file
 
 ## Contact
 
-For questions and feedback, please reach out to the maintainers at <x-email@example.com>.
+For questions and feedback, please reach out to the maintainers at <oyetunjiibukunoluwa8@gmail.com>.
