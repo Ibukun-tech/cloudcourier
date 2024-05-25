@@ -1,45 +1,49 @@
 package cloudcourier
 
 import (
-	"fmt"
-	"reflect"
+	"errors"
+	"io"
 )
 
-func NewCloudCourier(ccb *CloudCourierBridge) (General, error) {
-	if ccb == nil {
-		return nil, fmt.Errorf("it's an error")
-	}
+type ccbCourier string
 
-	v := reflect.TypeOf(ccb)
-	if v.Elem().Kind() != reflect.Struct {
-		return nil, fmt.Errorf("this is an inavalid type %s", v.Elem().Name())
-	}
+const (
+	Aws        ccbCourier = "aws"
+	Gcp        ccbCourier = "gcp"
+	Cloudinary ccbCourier = "cloudinary"
+)
 
-	if v.Elem().Name() != cloudCourierBridge {
-		return nil, fmt.Errorf("invalid type the type to be use is %s", v.Elem().Name())
-	}
+type CloudCourierBridge struct {
+	// used by AWS S3 to specify the Region
+	CloudRegion string
+	// This helps to show the cloud provider you want to use
+	CloudProvider ccbCourier
+	// The Api key for now I am just using it to access the cloudinary services
+	ApiKey string
+	// The Api secret which corresponds to the ApiKey
+	ApiSecret string
+	// This is for cloudinary you need to provide the cloud name for the cloudinary
+	CloudName string
+	//We need to specify bucket for other cloud storage providers that make use of it for example s3, Google cloud storage
+	CloudBucket string
+}
 
-	if ccb.CloudProvider == "" {
-		return nil, fmt.Errorf("we need to ")
-	}
+type StorageClient interface {
+	UploadFile(filePath string, reader io.Reader) error // Uploads a file from an io.Reader source to the specified path.
+	DeleteFile(fileID string) error                     // Deletes a file identified by a unique identifier.
+	ListFiles(directory string) ([]string, error)       // Lists files under a specified directory.
+	GetFile(fileID string) (io.Reader, error)           // Retrieves a file as an io.Reader by its unique identifier.
+}
 
-	if _, ok := provider[ccb.CloudProvider]; !ok {
-		return nil, fmt.Errorf("does not support that cloud services %s", ccb.CloudProvider)
-	}
-
-	// Other services require a bucket but cloudinary services do not require a bucket
-	if ccb.CloudProvider == CloudinaryServices && ccb.CloudName == "" {
-		return nil, fmt.Errorf("since we are using cloudinary service you need to specify the cloudname")
-	}
-
-	if ccb.CloudProvider != CloudinaryServices && ccb.CloudBucket == "" {
-		// For now this is what I am thinking I will do but still working on how I will continue about it
-		return nil, nil
-	}
+func NewCloudCourier(ccb *CloudCourierBridge) (StorageClient, error) {
 	switch ccb.CloudProvider {
-	case CloudinaryServices:
-		return cloudinaryFuncMiddleService(ccb)
+	case Aws:
+		return newAWSClient(ccb)
+	case Cloudinary:
+		return newCloudinaryClient(ccb)
+	case Gcp:
+		return newGcpClient(ccb)
 	default:
-		return nil, fmt.Errorf("this %s cloud provider does not exist or does not support at the moment", ccb.CloudProvider)
+		return nil, errors.New("no cloud provider was specified")
 	}
 }

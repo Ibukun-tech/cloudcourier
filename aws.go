@@ -1,19 +1,40 @@
-package aws_provider
+package cloudcourier
 
 import (
 	"fmt"
 	"io"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-// AWSClient struct encapsulates the AWS S3 client to manage storage operations.
 type AWSClient struct {
-	S3         *s3.S3 // The S3 service client
-	BucketName string // The name of the bucket to operate on
+	BucketName string
+	S3         *s3.S3
 }
+
+func newAWSClient(cbb *CloudCourierBridge) (StorageClient, error) {
+	if cbb.CloudBucket == "" || cbb.CloudRegion == "" {
+		return nil, fmt.Errorf("incomplete AWS configuration")
+	}
+	sess, err := session.NewSession(&aws.Config{
+		Region: &cbb.CloudRegion,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create AWS session: %v", err)
+	}
+	s3Svc := s3.New(sess)
+	return &AWSClient{S3: s3Svc,
+		BucketName: cbb.CloudBucket}, nil
+}
+
+// AWSClient struct encapsulates the AWS S3 client to manage storage operations.
+// type AWSClient struct {
+// 	S3         *s3.S3 // The S3 service client
+// 	BucketName string // The name of the bucket to operate on
+// }
 
 // NewAWSClient creates a new client for AWS S3 operations.
 

@@ -10,6 +10,12 @@ import (
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 )
 
+//	UploadFile(filePath string, reader io.Reader) error // Uploads a file from an io.Reader source to the specified path.
+//
+// DeleteFile(fileID string) error                     // Deletes a file identified by a unique identifier.
+// ListFiles(directory string) ([]string, error)       // Lists files under a specified directory.
+// GetFile(fileID string) (io.Reader, error)           // Retrieves a file as an io.Reader by its unique identifier.
+
 func (c *Cloudinary) UploadFile(fileInterface interface{}) error {
 	fmt.Println("i AM HERE WORKING ALREADY ------ 1")
 	files, ok := fileInterface.(file.File)
@@ -20,10 +26,7 @@ func (c *Cloudinary) UploadFile(fileInterface interface{}) error {
 	if err := files.CheckIfTheFileIsValid(); err != nil {
 		return err
 	}
-	fmt.Println("Tell me when you are where ")
-	if !c.Connected() {
-		return fmt.Errorf("no active cloudinary client")
-	}
+
 	// var err error
 	if files.Path != "" {
 
@@ -58,13 +61,6 @@ func (c *Cloudinary) UploadFile(fileInterface interface{}) error {
 	return nil
 }
 
-func (c *Cloudinary) Connected() bool {
-	return c.Client != nil
-}
-
-func (c *Cloudinary) DisConnect() error {
-	if c.Client != nil {
-		c.Client = nil
-	}
-	return nil
-}
+func (c *Cloudinary) DeletFile()
+func (c *Cloudinary) ListFiles()
+func (c *Cloudinary) GetFile()

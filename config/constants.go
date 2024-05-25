@@ -3,6 +3,7 @@ package config
 const (
 	CloudProviderCloudinary = "cloudinary"
 	CloudProviderAWS        = "aws"
+	CloudProviderGcs        = "gcs"
 )
 
 // Providers represent the cloud providers being supported at the moment.

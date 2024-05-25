@@ -1,27 +1,39 @@
-package gcs_provider
+package cloudcourier
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"path/filepath"
+
+	"cloud.google.com/go/storage"
 )
 
-//	UploadFile(filePath string, reader io.Reader) error // Uploads a file from an io.Reader source to the specified path.
-//
-// DeleteFile(fileID string) error                     // Deletes a file identified by a unique identifier.
-// ListFiles(directory string) ([]string, error)       // Lists files under a specified directory.
-// GetFile(fileID string) (io.Reader, error)           // Retrieves a file as an io.Reader by its unique identifier.
+func newGcpClient(ccb *CloudCourierBridge) (StorageClient, error) {
+	if ccb.CloudBucket == "" {
+		return nil, fmt.Errorf("no bucket name for google cloud storage")
+	}
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("%s", err)
+	}
+	return &GcsClient{
+		Client:     client,
+		BucketName: ccb.CloudBucket,
+	}, nil
+}
 
 func (g *GcsClient) UploadFile(filePath string, reader io.Reader) error {
 	var BaseFileName string
 	ctx := context.Background()
 	if filePath != "" {
 		BaseFileName = filepath.Base(filePath)
+	} else {
+		return errors.New("you did not specify the filepath")
 	}
-	if filePath == "" {
-		return fmt.Errorf("you did not specify the filepath")
-	}
+
 	obj := g.Client.Bucket(g.BucketName).Object(BaseFileName)
 	w := obj.NewWriter(ctx)
 	if _, err := io.Copy(w, reader); err != nil {
@@ -38,13 +50,19 @@ func (g *GcsClient) UploadFile(filePath string, reader io.Reader) error {
 	return nil
 }
 
+type GcsClient struct {
+	// The client we will use in communicating with the gcs
+	Client *storage.Client
+	// The name of the bucket to operate on
+	BucketName string
+}
+
 func (g *GcsClient) DeleteFile(fieldID string) error {
 	return nil
 }
 func (g *GcsClient) ListFiles(directory string) ([]string, error) {
-	var st []string
-	st = append(st, "jsj")
-	return st, nil
+
+	return nil, nil
 }
 
 func (g *GcsClient) GetFile(fileID string) (io.Reader, error) {

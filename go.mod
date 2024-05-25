@@ -9,6 +9,7 @@ require (
 	cloud.google.com/go/iam v1.1.7 // indirect
 	cloud.google.com/go/storage v1.40.0 // indirect
 	github.com/aws/aws-sdk-go v1.51.21 // indirect
+	github.com/cloudinary/cloudinary-go v1.7.0 // indirect
 	github.com/cloudinary/cloudinary-go/v2 v2.7.0 // indirect
 	github.com/creasty/defaults v1.5.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
