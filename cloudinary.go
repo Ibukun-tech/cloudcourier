@@ -8,10 +8,8 @@ import (
 	"github.com/cloudinary/cloudinary-go"
 )
 
+// type clo
 type CloudinaryClient struct {
-	// Name you give to a file to be stored in cloudinary
-	Tag string
-	// This is for the transport side responsible for the intercommunication
 	Client *cloudinary.Cloudinary
 	// This helps to show the cloud provider you want to use
 	Provider string
@@ -23,6 +21,7 @@ type CloudinaryClient struct {
 	CloudName string
 }
 
+// t
 func newCloudinaryClient(cbb *CloudCourierBridge) (StorageClient, error) {
 	if cbb.ApiKey == "" || cbb.ApiSecret == "" || cbb.CloudName == "" {
 		return nil, errors.New("incomplete Cloudinary configuration") // TODO: handle properly.

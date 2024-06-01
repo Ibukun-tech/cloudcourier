@@ -4,10 +4,12 @@ go 1.21.3
 
 require (
 	cloud.google.com/go v0.114.0 // indirect
+	cloud.google.com/go/auth v0.4.2 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	cloud.google.com/go/compute v1.25.1 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
-	cloud.google.com/go/iam v1.1.7 // indirect
-	cloud.google.com/go/storage v1.40.0 // indirect
+	cloud.google.com/go/iam v1.1.8 // indirect
+	cloud.google.com/go/storage v1.41.0 // indirect
 	github.com/aws/aws-sdk-go v1.51.21 // indirect
 	github.com/cloudinary/cloudinary-go v1.7.0 // indirect
 	github.com/cloudinary/cloudinary-go/v2 v2.7.0 // indirect

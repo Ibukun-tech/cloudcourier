@@ -73,15 +73,15 @@ func (g *GcsClient) ListFiles(directory string) ([]string, error) {
 	it := g.Client.Bucket(directory).Objects(g.ctx, nil)
 	for {
 		file, err := it.Next()
-		if err == iterator.Done() {
-			return files, nil
+		if err == iterator.Done{
+			break
 		}
 		if err != nil {
 			return nil, errors.New("")
 		}
 		files = append(files, file.Name)
 	}
-	// return nil, nil
+	return files, nil
 }
 
 func (g *GcsClient) GetFile(fileID string) (io.Reader, error) {
