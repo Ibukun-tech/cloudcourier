@@ -29,7 +29,6 @@ func newGcpClient(ccb *CloudCourierBridge) (StorageClient, error) {
 
 func (g *GcsClient) UploadFile(filePath string, reader io.Reader) error {
 	var BaseFileName string
-	ctx := context.Background()
 	if filePath != "" {
 		BaseFileName = filepath.Base(filePath)
 	} else {
@@ -37,14 +36,18 @@ func (g *GcsClient) UploadFile(filePath string, reader io.Reader) error {
 	}
 
 	obj := g.Client.Bucket(g.BucketName).Object(BaseFileName)
-	w := obj.NewWriter(ctx)
+	w := obj.NewWriter(g.ctx)
 	if _, err := io.Copy(w, reader); err != nil {
 		return fmt.Errorf("you did not set the reader to the file")
 	}
-	if err := w.Close(); err != nil {
-		return fmt.Errorf("could not upload file")
-	}
-	v, err := obj.Attrs(ctx)
+	defer func() error {
+		if err := w.Close(); err != nil {
+			return fmt.Errorf("could not upload file")
+		}
+		return nil
+	}()
+
+	v, err := obj.Attrs(g.ctx)
 	if err != nil {
 		return fmt.Errorf("%s", err)
 	}
@@ -78,7 +81,7 @@ func (g *GcsClient) ListFiles(directory string) ([]string, error) {
 		}
 		files = append(files, file.Name)
 	}
-	return nil, nil
+	// return nil, nil
 }
 
 func (g *GcsClient) GetFile(fileID string) (io.Reader, error) {
