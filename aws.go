@@ -10,24 +10,38 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
+type AwsManufacture struct {
+	Region string
+	Bucket string
+}
+
+func (a *AwsManufacture) GetProvider() cloudCourierProvider {
+	return AWS
+}
+func init() {
+	storeFunc[AWS] = newAWSClient
+}
+
 type AWSClient struct {
+	AwConfig   *AwsManufacture
 	BucketName string
 	S3         *s3.S3
 }
 
-func newAWSClient(cbb *CloudCourierBridge) (StorageClient, error) {
-	if cbb.CloudBucket == "" || cbb.CloudRegion == "" {
-		return nil, fmt.Errorf("incomplete AWS configuration")
+func newAWSClient(cbb Provider) (StorageClient, error) {
+	awConfig, ok := cbb.(*AwsManufacture)
+	if !ok {
+		return nil, fmt.Errorf("incorrect configuration")
 	}
 	sess, err := session.NewSession(&aws.Config{
-		Region: &cbb.CloudRegion,
+		Region: &awConfig.Region,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create AWS session: %v", err)
 	}
 	s3Svc := s3.New(sess)
 	return &AWSClient{S3: s3Svc,
-		BucketName: cbb.CloudBucket}, nil
+		BucketName: awConfig.Bucket, AwConfig: awConfig}, nil
 }
 
 // AWSClient struct encapsulates the AWS S3 client to manage storage operations.

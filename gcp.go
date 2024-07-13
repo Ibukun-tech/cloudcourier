@@ -11,9 +11,31 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func newGcpClient(ccb *CloudCourierBridge) (StorageClient, error) {
-	if ccb.CloudBucket == "" {
-		return nil, fmt.Errorf("no bucket name for google cloud storage")
+type GcpCloud struct {
+	Bucket string
+}
+
+func (g *GcpCloud) GetProvider() cloudCourierProvider {
+	return GCP
+}
+
+func init() {
+	storeFunc[GCP] = newGcpClient
+}
+
+type GcsClient struct {
+	// The client we will use in communicating with the gcs
+	Client *storage.Client
+	// The name of the bucket to operate on
+	BucketName string
+	ctx        context.Context
+}
+
+func newGcpClient(ccb Provider) (StorageClient, error) {
+	gcConfig, ok := ccb.(*GcpCloud)
+	// if ccb.type
+	if !ok {
+		return nil, fmt.Errorf("incorrect configuration")
 	}
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
@@ -22,7 +44,7 @@ func newGcpClient(ccb *CloudCourierBridge) (StorageClient, error) {
 	}
 	return &GcsClient{
 		Client:     client,
-		BucketName: ccb.CloudBucket,
+		BucketName: gcConfig.Bucket,
 		ctx:        ctx,
 	}, nil
 }
@@ -55,25 +77,13 @@ func (g *GcsClient) UploadFile(filePath string, reader io.Reader) error {
 	return nil
 }
 
-type GcsClient struct {
-	// The client we will use in communicating with the gcs
-	Client *storage.Client
-	// The name of the bucket to operate on
-	BucketName string
-
-	ctx context.Context
-}
-
-func (g *GcsClient) DeleteFile(fieldID string) error {
-	return nil
-}
 func (g *GcsClient) ListFiles(directory string) ([]string, error) {
 	// For lisiting files in a google cloud storage you have to list the nme of the bucket
 	var files []string
 	it := g.Client.Bucket(directory).Objects(g.ctx, nil)
 	for {
 		file, err := it.Next()
-		if err == iterator.Done{
+		if err == iterator.Done {
 			break
 		}
 		if err != nil {
@@ -86,4 +96,8 @@ func (g *GcsClient) ListFiles(directory string) ([]string, error) {
 
 func (g *GcsClient) GetFile(fileID string) (io.Reader, error) {
 	return nil, nil
+}
+
+func (g *GcsClient) DeleteFile(fieldID string) error {
+	return nil
 }

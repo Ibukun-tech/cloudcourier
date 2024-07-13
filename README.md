@@ -12,7 +12,8 @@ It provides a unified interface to interact with different cloud providers, allo
 
 ## Supported Cloud Providers
 
-- Cloudinary
+- Google cloud storage
+- Aws Bucket
 
 ## Getting Started
 
@@ -25,7 +26,7 @@ It provides a unified interface to interact with different cloud providers, allo
 To install Cloud Courier, use the following `go get` command:
 
 ```sh
-go get -u github.com//cloudcourier
+go get https://github.com/Ibukun-tech/cloudcourier
 ```
 
 ### Usage
@@ -36,8 +37,7 @@ Here's a quick example of how to use Cloud Courier to upload a file to Cloudinar
 package main
 
 import (
-    "github.com/yourusername/cloudcourier"
-    "github.com/yourusername/cloudcourier/types"
+    "github.com/Ibukun-tech/cloudcourier"
 )
 
 func main() {
