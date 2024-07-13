@@ -26,44 +26,87 @@ It provides a unified interface to interact with different cloud providers, allo
 To install Cloud Courier, use the following `go get` command:
 
 ```sh
-go get https://github.com/Ibukun-tech/cloudcourier
+go get -u github.com/Ibukun-tech/cloudcourier
 ```
 
 ### Usage
 
-Here's a quick example of how to use Cloud Courier to upload a file to Cloudinary:
+Here's a quick example of how to use Cloud Courier to upload a file to Google cloud storage, list files from google cloud storage:
 
 ```go
 package main
 
 import (
     "github.com/Ibukun-tech/cloudcourier"
+    "os"
+    "log"
+    "fmt"
 )
 
 func main() {
-    // Initialize the CloudCourierBridge with your Cloudinary credentials
-    ccb := &types.CloudCourierBridge{
-        CloudProvider: "cloudinary",
-        ApiKey:        "your-api-key",
-        ApiSecret:     "your-api-secret",
-        CloudName:     "your-cloud-name",
+    gcp:=&cloudcourier.GcpCloud{
+        Bucket:"name-Bucket"
     }
 
-    // Create a new Cloud Courier instance
-    courier, err := cloudcourier.NewCloudCourier(ccb)
-    if err != nil {
-        log.Fatalf("Failed to create Cloud Courier: %v", err)
+    client, err:= cloudcourier.NewCloudCourierBridge(gcp)
+    if err!= nil{
+        log.Fatal(err)
+    }
+    writer, err:= os.Open("./pathToTheFile")
+    if err!= nil{
+        // You can also find a better way to handle the err
+        log.Fatal(err)
+    }
+   // To upload file in google cloud storage
+   // The path is specified to get the object name where it
+   // would  be storeg in Google cloud storage
+   err:= client.UploadFile("/atata/ayayay", writer)
+    if err!= nil{
+        log.Fatal(err)
     }
 
-    // Upload a file
-    err = courier.UploadFile(yourFile)
-    if err != nil {
-        log.Fatalf("Failed to upload file: %v", err)
+    // To also list files
+    // You put the name of the bucket you want to
+    files, err:=client.ListFiles("name-bucket")
+    if err!= nil{
+        log.Fatal(err)
+    }
+    for _,v:=range files{
+        fmt.Println(v)
     }
 }
 ```
 
-Replace `your-api-key`, `your-api-secret`, and `your-cloud-name` with your actual Cloudinary credentials.
+### Usage of cloudcourier with AWS
+
+```go
+import(
+    "github.com/Ibukun-tech/cloudcourier"
+    "log"
+    "fmt"
+)
+
+func main(){
+    aws:=&cloudcourier.AwsManufacture{
+        Region:"aws-region",
+        Bucket:"aws-bucket",
+    }
+    client, err:=cloudcourier.NewCloudCourierBridge(aws)
+    if err!= nil{
+        log.Fatal(err)
+    }
+        writer, err:= os.Open("./pathToTheFile")
+    if err!= nil{
+        // You can also find a better way to handle the err
+        log.Fatal(err)
+    }
+    // This how you upload file to AWS
+    err:= client.UploadFile("/atata/ayayay", writer)
+    if err!= nil{
+        log.Fatal(err)
+    }
+}
+```
 
 ### Documentation
 

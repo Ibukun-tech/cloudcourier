@@ -78,7 +78,7 @@ func (g *GcsClient) UploadFile(filePath string, reader io.Reader) error {
 }
 
 func (g *GcsClient) ListFiles(directory string) ([]string, error) {
-	// For lisiting files in a google cloud storage you have to list the nme of the bucket
+	// For lisiting files in a google cloud storage you have to list the name of the bucket
 	var files []string
 	it := g.Client.Bucket(directory).Objects(g.ctx, nil)
 	for {
