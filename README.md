@@ -84,6 +84,7 @@ import(
     "github.com/Ibukun-tech/cloudcourier"
     "log"
     "fmt"
+    "io"
 )
 
 func main(){
@@ -95,7 +96,7 @@ func main(){
     if err!= nil{
         log.Fatal(err)
     }
-        writer, err:= os.Open("./pathToTheFile")
+    writer, err:= os.Open("./pathToTheFile")
     if err!= nil{
         // You can also find a better way to handle the err
         log.Fatal(err)
@@ -105,6 +106,25 @@ func main(){
     if err!= nil{
         log.Fatal(err)
     }
+
+    // DeleteFile deletes a file from S3 by its key.
+    err:=client.DeleteFile("key")
+    if err!= nil{
+        log.Fatal(err)
+    }
+    // ListFiles lists all files in a specified directory of the   S3 bucket.
+    files, err:=client.ListFiles("directory")
+    if err!= nil{
+        log.Fatal(err)
+    }
+    // GetFile retrieves a file as an io.Reader by its key from S3.
+    var body io.Reader
+    var err error
+    body, err=client.GetFile("key")
+    if err!= nil{
+        log.Fatal(err)
+    }
+
 }
 ```
 
