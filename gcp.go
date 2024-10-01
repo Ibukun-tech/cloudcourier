@@ -98,11 +98,20 @@ func (g *GcsClient) GetFile(fileID string) (io.Reader, error) {
 	obj := g.Client.Bucket(g.BucketName).Object(fileID)
 	r, err := obj.NewReader(g.ctx)
 	if err != nil {
-		return nil, fmt.Errorf("could not get file")
+		switch {
+		case errors.Is(err, storage.ErrObjectNotExist):
+			return nil, fmt.Errorf(storage.ErrObjectNotExist.Error())
+		default:
+			return nil, fmt.Errorf("could not get file")
+		}
 	}
 	return r, nil
 }
 
 func (g *GcsClient) DeleteFile(fieldID string) error {
+	obj := g.Client.Bucket(g.BucketName).Object(fieldID)
+	if err := obj.Delete(g.ctx); err != nil {
+		return fmt.Errorf("could not delete file")
+	}
 	return nil
 }
