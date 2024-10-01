@@ -95,7 +95,12 @@ func (g *GcsClient) ListFiles(directory string) ([]string, error) {
 }
 
 func (g *GcsClient) GetFile(fileID string) (io.Reader, error) {
-	return nil, nil
+	obj := g.Client.Bucket(g.BucketName).Object(fileID)
+	r, err := obj.NewReader(g.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not get file")
+	}
+	return r, nil
 }
 
 func (g *GcsClient) DeleteFile(fieldID string) error {
